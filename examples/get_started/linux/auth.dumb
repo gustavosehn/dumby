@@ -1,0 +1,67 @@
+// Dumb Language (Linux Syntax)
+// 02: Authentication System (Modular 32-bit x86 Syscalls)
+
+bits 32
+
+char *valid_pass = "123456\n";
+char *name[32];                 // 32-byte input buffer (.bss)
+char *pass[32];                 // 32-byte input buffer (.bss)
+
+// Write string to stdout
+void print(char *text, int len) {
+    move eax = 4h;              // sys_write
+    move ebx = 1h;              // stdout
+    move ecx = text;
+    move edx = len;
+    int 80h;
+}
+
+// Read input from stdin (returns length in eax)
+int read(char *buffer, int max_len) {
+    move eax = 3h;              // sys_read
+    move ebx = 0h;              // stdin
+    move ecx = buffer;
+    move edx = max_len;
+    int 80h;
+    return eax;
+}
+
+// Compare input password with valid_pass (returns 1 if valid, 0 otherwise)
+int check_password() {
+    move esi = 0;
+    while (esi < 7) {
+        if (pass[esi] != valid_pass[esi]) {
+            return 0;
+        }
+        add esi, 1;
+    }
+    return 1;
+}
+
+// Terminate process
+void exit(int code) {
+    move eax = 1h;              // sys_exit
+    move ebx = code;
+    int 80h;
+}
+
+void Main() {
+    print("What is your name? ", 19);
+    int name_len = read(name, 32);
+    sub name_len, 1;            // Strip trailing '\n'
+    
+    print("What is the password? ", 22);
+    read(pass, 32);
+    
+    if (check_password() == 1) {
+        print("Welcome, ", 9);
+        print(name, name_len);
+        print("!\n", 2);
+    } else {
+        print("Access denied.\n", 15);
+    }
+    
+    exit(0);
+}
+
+Main();

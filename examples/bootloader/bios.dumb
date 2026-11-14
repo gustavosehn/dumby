@@ -1,0 +1,16 @@
+// Dumb Language
+// 03: Boot Loader 16 bits made in Dumb Language
+
+bits 16                                    // Set 16-bit Real Mode (BIOS default)
+org 7c00h                               // BIOS loads bootloader at address 0x7C00
+
+void kernel_main() {
+    while(1) {
+        // Infinite loop to prevent CPU from executing garbage
+    }
+}
+
+kernel_main();                               // Entry point
+
+pad (510 - ($ - $$)) db 0;              // Fill remaining bytes up to 510 with zeros
+dw AA55h;                                    // Boot signature (required by BIOS)

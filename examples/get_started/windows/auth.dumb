@@ -1,0 +1,75 @@
+// Dumb Language (Windows Syntax)
+// 02: Authentication System
+
+bits 32
+
+extern GetStdHandle;
+extern WriteConsoleA;
+extern ReadConsoleA;
+extern lstrcmpA;
+extern ExitProcess;
+
+char *valid_pass = "123456\r\n";        // Windows console uses \r\n for Enter
+char *name;                         // 32-byte buffer
+char *pass;                         // 32-byte buffer
+int hIn  = 0;
+int hOut = 0;
+
+void print(char *text, int len) {
+    push 0;
+    push esp;
+    push len;
+    push text;
+    push hOut;
+    call WriteConsoleA;
+    pop eax;
+}
+
+int read(char *buffer, int max_len) {
+    push 0;                             // Allocate 4 bytes on stack for bytesRead
+    push esp;                           // lpNumberOfCharsRead
+    push max_len;
+    push buffer;
+    push hIn;
+    call ReadConsoleA;
+    pop eax;                            // Pop bytesRead into eax
+    return eax;
+}
+
+void Main() {
+    // Get stdin (-10) and stdout (-11) handles
+    push -10;
+    call GetStdHandle;
+    move hIn = eax;
+
+    push -11;
+    call GetStdHandle;
+    move hOut = eax;
+
+    // 1. Prompt and read username
+    print("What is your name? ", 19);
+    int name_len = read(name, 32);
+    sub name_len, 2;                    // Strip trailing '\r\n' (2 bytes on Windows)
+
+    // 2. Prompt and read password
+    print("What is the password? ", 22);
+    read(pass, 32);
+
+    // 3. Compare password using Win32 API (lstrcmpA returns 0 if equal)
+    push valid_pass;
+    push pass;
+    call lstrcmpA;
+
+    if (eax == 0) {
+        print("Welcome, ", 9);
+        print(name, name_len);
+        print("!\r\n", 3);
+    } else {
+        print("Access denied.\r\n", 16);
+    }
+
+    push 0;
+    call ExitProcess;
+}
+
+Main();

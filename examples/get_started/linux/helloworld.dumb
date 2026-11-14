@@ -1,0 +1,24 @@
+// Dumb Language (Linux Syntax)
+// 01: Hello World 32 bits made in Dumb Language
+
+bits 32                     // Set 32-bit x86 mode
+
+char *msg = "Hello, World!"; // Message string (14 bytes)
+
+void Main() {
+    
+    // Print message (sys_write)
+    move eax = 4h;          // Syscall: sys_write
+    move ebx = 1h;          // File descriptor: stdout
+    move ecx = msg;         // String pointer
+    move edx = 14;          // String length
+    int 80h;                // Call Linux kernel
+    
+    // Exit program (sys_exit)
+    move eax = 1h;          // Syscall: sys_exit
+    move ebx = 0;           // Exit code: 0 (success)
+    int 80h;                // Call Linux kernel
+    
+}
+
+Main();                     // Entry point

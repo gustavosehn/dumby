@@ -1,0 +1,17 @@
+// Dumb Language
+// 04: Boot / Kernel 32 bits made in Dumb Language
+
+bits 32                                 // Set 32-bit Protected Mode
+
+// Multiboot header (required for GRUB / QEMU)
+dd 1BADB002h;                           // Multiboot magic number
+dd 00h;                                 // Flags
+dd -(1BADB002h + 00h);                  // Checksum (magic + flags + checksum = 0)
+
+void kernel_main() {
+    while(1) {
+        // Halt loop
+    }
+}
+
+kernel_main();                          // Entry point

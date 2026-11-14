@@ -1,0 +1,28 @@
+// Dumb Language (Windows Syntax)
+// 01: Hello World 32 bits made in Dumb Language
+
+bits 32                                     // Set 32-bit x86 mode
+
+// Import Windows API functions
+extern MessageBoxA;
+extern ExitProcess;
+
+char *msg = "Hello, World!";                // Message text
+char *title = "Dumb Language";           // Window title
+
+void Main() {
+    
+    // Show popup message box
+    push 0;                                  // Style: MB_OK
+    push title;                             // Window title
+    push msg;                             // Message text
+    push 0;                                 // Owner window: NULL
+    call MessageBoxA;
+    
+    // Exit program
+    push 0;                                 // Exit code: 0
+    call ExitProcess;
+    
+}
+
+Main();                                     // Entry point
